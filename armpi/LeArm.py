@@ -15,7 +15,7 @@ stopRunning = False     # 初始化停止标识
 # ####判断+赋值
 def setServo(servoId, pos, time):     # 舵机转动函数
     global runningAction
-    
+
     if servoId < 1 or servoId > 6:
         return
     if pos > 2500:
@@ -29,7 +29,7 @@ def setServo(servoId, pos, time):     # 舵机转动函数
     elif time < 20:
         time = 20
     else:
-        pass    
+        pass
     if runningAction is False:  # 如果没有动作组在运行
         Servos[servoId - 1].setPosition(pos, time)
         # -1是因为数组是从0开始的，在Python的解释器内部，当我们调用Servos[servoId - 1].setPosition(pos, time)时,
@@ -92,27 +92,34 @@ def runActionGroup(actNum, times):
                     break
     else:
         runningAction = False
-        print("未能找到动作组文件")
+        print("Action group file not found")
 
 
 def initLeArm(d):
     global Servos
     global pi
     pi = pigpio.pi()    # 实例化
-    servo1 = PWM_Servo(pi, 12,  deviation=d[0], control_speed = True) #初始化各舵机
-    servo2 = PWM_Servo(pi, 16, deviation=d[1], control_speed = True)
-    servo3 = PWM_Servo(pi, 20, deviation=d[2], control_speed = True)
-    servo4 = PWM_Servo(pi, 21, deviation=d[3], control_speed = True)
-    servo5 = PWM_Servo(pi, 19, deviation=d[4], control_speed = True)
-    servo6 = PWM_Servo(pi, 13, deviation=d[5], control_speed = True)
+    servo1 = PWM_Servo(pi, 12,  deviation=d[0], position = 700, control_speed = True) #初始化各舵机
+    servo2 = PWM_Servo(pi, 16, deviation=d[1], position = 1500, control_speed = True)
+    servo3 = PWM_Servo(pi, 20, deviation=d[2], position = 971, control_speed = True)
+    servo4 = PWM_Servo(pi, 21, deviation=d[3], position = 908, control_speed = True)
+    servo5 = PWM_Servo(pi, 19, deviation=d[4], position = 1763, control_speed = True)
+    servo6 = PWM_Servo(pi, 13, deviation=d[5], position = 1500, control_speed = True)
     Servos = (servo1, servo2, servo3, servo4, servo5, servo6)
-    
+
+    print('Initialize Positon')
     for i in range(0, 6, 1):
-        Servos[i].setPosition(1500, 1000)  # 1-6号舵机转到中位
+        Servos[i].setPosition(Servos[i].initPosition, 1000)
+
 
 def stopLeArm():
-    print("停止机械臂")
+    global Servos
+    global pi
+    print("Stop Robot Arm")
+    for i in range(0, 6, 1):
+        Servos[i].setPosition(Servos[i].initPosition, 1000)  # 1-6号舵机转到中位
     pi.stop()   # 断开pwm连接
+
 
 if __name__ == "__main__":
     initLeArm([0,0,0,0,0,0])
