@@ -16,6 +16,7 @@ for i in range(0, len(LeConf.Deviation), 1):
         d.append(LeConf.Deviation[i] - 1500)
 
 LeArm.initLeArm(tuple(d))
+time.sleep(2)
 targetX = 0
 targetY = 0
 targetZ = 4000
@@ -112,6 +113,25 @@ def ki_move(x, y, z, movetime):#x，y，z为给定坐标，movetime为舵机转�
         time.sleep(movetime / 1000.0)
         return True
     else:
+        return False
+
+
+def move(x, y, z, target_alpha, movetime):
+    if kinematic_analysis(x, y, z, target_alpha):
+        print('OK')
+        theta3, theta4, theta5, theta6 = kinematic_analysis(x, y, z, target_alpha)
+        pwm_6 = int(2000.0 * theta6 / 180.0 + 500.0)
+        pwm_5 = int(2000.0 * (90.0 - theta5) / 180.0 + 1500.0)
+        pwm_4 = int(2000.0 * (135.0 - theta4) / 270.0 + 500.0)
+        pwm_3 = int(2000.0 * theta3 / 180.0 + 1500.0)
+        LeArm.setServo(3, pwm_3, movetime)
+        LeArm.setServo(4, pwm_4, movetime)
+        LeArm.setServo(5, pwm_5, movetime)
+        LeArm.setServo(6, pwm_6, movetime)
+        time.sleep(movetime / 1000.0)
+        return True
+    else:
+        print('NG')
         return False
 
 
